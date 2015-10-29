@@ -1,0 +1,68 @@
+CC       := gcc
+CFLAGS   += -O2 -Wall -fmessage-length=0
+LDFLAGS  += -lpthread -lrt
+CPPFLAGS += -D__GCC_POSIX__=1 -DUSE_STDIO=1
+
+#SOURCES := $(shell find *.c)
+SOURCES := $(shell find AsyncIO -iname '*.c')
+SOURCES += $(shell find FileIO -iname '*.c')
+SOURCES += $(shell find FreeRTOS_Kernel -iname '*.c')
+SOURCES += $(shell find Common_Demo -iname '*.c')
+OBJECTS := $(addprefix obj/, $(SOURCES:.c=.o))
+OBJDIRS := $(sort $(dir $(OBJECTS)))
+DEPENDS := $(OBJECTS:.o=.d)
+
+# includes
+CFLAGS  += $(addprefix -I, $(addsuffix include/, $(sort $(dir $(SOURCES)))))
+CFLAGS  += -I. -IFreeRTOS_Kernel/portable/GCC/Posix -IFreeRTOS_Kernel/portable/MemMang -ICommon_Demo/include
+
+.PHONY: all prep
+.SUFFIXES: .c .o .d .h .hh .cpp .cc .out
+
+all: prep FreeRTOS
+
+prep:
+	@mkdir -p obj
+	@mkdir -p $(OBJDIRS)
+
+print-%:
+	@echo $* = $($*)
+
+nprint-%:
+	@echo $* = $($*) | tr ' ' '\n'
+
+clean:
+	@rm -rf obj/
+
+obj/AsyncIO/%.o: AsyncIO/%.c 
+	@echo "[CC ]    $<"
+	@$(CC) $(CFLAGS) $< -c -MP -MMD -o $@ $(CPPFLAGS)
+
+obj/FileIO/%.o: FileIO/%.c 
+	@echo "[CC ]    $<"
+	@$(CC) $(CFLAGS) $< -c -MP -MMD -o $@ $(CPPFLAGS)
+
+obj/FreeRTOS_Kernel/%.o: FreeRTOS_Kernel/%.c 
+	@echo "[CC ]    $<"
+	@$(CC) $(CFLAGS) $< -c -MP -MMD -o $@ $(CPPFLAGS)
+
+obj/FreeRTOS_Kernel/portable/MemMang%.o: FreeRTOS_Kernel/portable/MemMang%.c 
+	@echo "[CC ]    $<"
+	@$(CC) $(CFLAGS) $< -c -MP -MMD -o $@ $(CPPFLAGS)
+
+obj/FreeRTOS_Kernel/portable/GCC/Posix/%.o: FreeRTOS_Kernel/portable/GCC/Posix/%.c 
+	@echo "[CC ]    $<"
+	@$(CC) $(CFLAGS) $< -c -MP -MMD -o $@ $(CPPFLAGS)
+
+obj/Common_Demo/Minimal/%.o: Common_Demo/Minimal/%.c 
+	@echo "[CC ]    $<"
+	@$(CC) $(CFLAGS) $< -c -MP -MMD -o $@ $(CPPFLAGS)
+
+obj/Common_Demo/Full/%.o: Common_Demo/Full/%.c 
+	@echo "[CC ]    $<"
+	@$(CC) $(CFLAGS) $< -c -MP -MMD -o $@ $(CPPFLAGS)
+
+FreeRTOS: $(OBJECTS)
+	@echo "[LD ]    $<"
+	@$(CC) $(CFLAGS) $(CPPFLAGS) $^ $(LDFLAGS) -o Test
+
