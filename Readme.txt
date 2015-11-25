@@ -1,3 +1,17 @@
+Original Readme.txt below.
+
+This project's goals:
+ * Build without eclipse (done)
+ * Create layer to stub real `ports` for testing
+ * Keep the simulator up to date
+ * Fix shitty networking code
+
+
+
+
+
+------------------------------------------------------------------------------------------
+
 Posix GCC Eclipse FreeRTOS 6.0.4 Simulator
 
 Contributed by William Davy. william.davy@wittenstein.co.uk
