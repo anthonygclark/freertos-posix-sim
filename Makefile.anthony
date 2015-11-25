@@ -7,7 +7,7 @@ CPPFLAGS += -D__GCC_POSIX__=1 -DUSE_STDIO=1
 SOURCES := $(shell find AsyncIO -iname '*.c')
 SOURCES += $(shell find FileIO -iname '*.c')
 SOURCES += $(shell find FreeRTOS_Kernel -iname '*.c')
-SOURCES += $(shell find Common_Demo -iname '*.c')
+#SOURCES += $(shell find Common_Demo -iname '*.c')
 OBJECTS := $(addprefix obj/, $(SOURCES:.c=.o))
 OBJDIRS := $(sort $(dir $(OBJECTS)))
 DEPENDS := $(OBJECTS:.o=.d)
@@ -32,7 +32,7 @@ nprint-%:
 	@echo $* = $($*) | tr ' ' '\n'
 
 clean:
-	@rm -rf obj/
+	@rm -rf obj/ Test
 
 obj/AsyncIO/%.o: AsyncIO/%.c 
 	@echo "[CC ]    $<"
@@ -54,15 +54,15 @@ obj/FreeRTOS_Kernel/portable/GCC/Posix/%.o: FreeRTOS_Kernel/portable/GCC/Posix/%
 	@echo "[CC ]    $<"
 	@$(CC) $(CFLAGS) $< -c -MP -MMD -o $@ $(CPPFLAGS)
 
-obj/Common_Demo/Minimal/%.o: Common_Demo/Minimal/%.c 
-	@echo "[CC ]    $<"
-	@$(CC) $(CFLAGS) $< -c -MP -MMD -o $@ $(CPPFLAGS)
-
-obj/Common_Demo/Full/%.o: Common_Demo/Full/%.c 
-	@echo "[CC ]    $<"
-	@$(CC) $(CFLAGS) $< -c -MP -MMD -o $@ $(CPPFLAGS)
+#obj/Common_Demo/Minimal/%.o: Common_Demo/Minimal/%.c 
+#	@echo "[CC ]    $<"
+#	@$(CC) $(CFLAGS) $< -c -MP -MMD -o $@ $(CPPFLAGS)
+#
+#obj/Common_Demo/Full/%.o: Common_Demo/Full/%.c 
+#	@echo "[CC ]    $<"
+#	@$(CC) $(CFLAGS) $< -c -MP -MMD -o $@ $(CPPFLAGS)
 
 FreeRTOS: $(OBJECTS)
-	@echo "[LD ]    $<"
-	@$(CC) $(CFLAGS) $(CPPFLAGS) $^ $(LDFLAGS) -o Test
+	@echo "[LD ]    main.c"
+	@$(CC) $(CFLAGS) $(CPPFLAGS) $^ main.c $(LDFLAGS) -o Test
 
